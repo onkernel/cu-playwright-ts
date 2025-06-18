@@ -63,7 +63,7 @@ new ComputerUseAgent(options: {
 **Parameters:**
 - `apiKey` (string): Your Anthropic API key. Get one from [Anthropic Console](https://console.anthropic.com/)
 - `page` (Page): Playwright page instance to control
-- `model` (string, optional): Anthropic model to use. Defaults to `'claude-3-5-sonnet-20241022'`
+- `model` (string, optional): Anthropic model to use. Defaults to `'claude-sonnet-4-20250514'`
 
 **Supported Models:**
 See [Anthropic's Computer Use documentation](https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/computer-use-tool#model-compatibility) for the latest model compatibility.
