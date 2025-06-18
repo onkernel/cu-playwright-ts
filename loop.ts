@@ -191,3 +191,66 @@ export async function samplingLoop({
     }
   }
 }
+
+/**
+ * Simplified computer use loop for executing tasks with Claude
+ * 
+ * This function provides a higher-level interface to the sampling loop,
+ * accepting a simple query string instead of message arrays.
+ * 
+ * @param options - Configuration options
+ * @param options.query - The task description for Claude to execute
+ * @param options.apiKey - Anthropic API key for authentication
+ * @param options.playwrightPage - Playwright page instance to control
+ * @param options.model - Anthropic model to use (default: claude-sonnet-4-20250514)
+ * @param options.systemPromptSuffix - Additional instructions appended to system prompt
+ * @param options.maxTokens - Maximum tokens for response (default: 4096)
+ * @param options.toolVersion - Computer use tool version (auto-selected based on model)
+ * @param options.thinkingBudget - Token budget for Claude's reasoning (default: 1024)
+ * @param options.tokenEfficientToolsBeta - Enable token-efficient tools beta
+ * @param options.onlyNMostRecentImages - Limit number of recent images to include
+ * 
+ * @returns Promise resolving to array of conversation messages
+ * 
+ * @see https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/computer-use-tool
+ * @see https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking
+ */
+export async function computerUseLoop({
+  query,
+  apiKey,
+  playwrightPage,
+  model = 'claude-sonnet-4-20250514',
+  systemPromptSuffix,
+  maxTokens = 4096,
+  toolVersion,
+  thinkingBudget = 1024,
+  tokenEfficientToolsBeta = false,
+  onlyNMostRecentImages,
+}: {
+  query: string;
+  apiKey: string;
+  playwrightPage: Page;
+  model?: string;
+  systemPromptSuffix?: string;
+  maxTokens?: number;
+  toolVersion?: ToolVersion;
+  thinkingBudget?: number;
+  tokenEfficientToolsBeta?: boolean;
+  onlyNMostRecentImages?: number;
+}): Promise<BetaMessageParam[]> {
+  return samplingLoop({
+    model,
+    systemPromptSuffix,
+    messages: [{
+      role: 'user',
+      content: query,
+    }],
+    apiKey,
+    maxTokens,
+    toolVersion,
+    thinkingBudget,
+    tokenEfficientToolsBeta,
+    onlyNMostRecentImages,
+    playwrightPage,
+  });
+}
