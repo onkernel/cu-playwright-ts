@@ -13,18 +13,18 @@ A TypeScript SDK that combines Anthropic's Computer Use capabilities with Playwr
 ## Installation
 
 ```bash
-npm install cu-playwright-ts
+npm install @onkernel/cu-playwright-ts
 # or
-yarn add cu-playwright-ts
+yarn add @onkernel/cu-playwright-ts
 # or
-bun add cu-playwright-ts
+bun add @onkernel/cu-playwright-ts
 ```
 
 ## Quick Start
 
 ```typescript
 import { chromium } from 'playwright';
-import { ComputerUseAgent } from 'cu-playwright-ts';
+import { ComputerUseAgent } from '@onkernel/cu-playwright-ts';
 
 const browser = await chromium.launch({ headless: false });
 const page = await browser.newPage();
@@ -100,7 +100,7 @@ async execute<T = string>(
 ### Text Response
 
 ```typescript
-import { ComputerUseAgent } from 'cu-playwright-ts';
+import { ComputerUseAgent } from '@onkernel/cu-playwright-ts';
 
 // Navigate to the target page first
 await page.goto("https://news.ycombinator.com/");
@@ -120,7 +120,7 @@ console.log(result); // "Title of the top story"
 
 ```typescript
 import { z } from 'zod';
-import { ComputerUseAgent } from 'cu-playwright-ts';
+import { ComputerUseAgent } from '@onkernel/cu-playwright-ts';
 
 const agent = new ComputerUseAgent({
   apiKey: process.env.ANTHROPIC_API_KEY!,
