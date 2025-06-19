@@ -1,0 +1,61 @@
+{
+  "name": "@onkernel/cu-playwright-ts",
+  "version": "0.1.0",
+  "description": "Computer Use x Playwright SDK - Use Anthropic's Computer Use capabilities with Playwright",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build ./index.ts --outdir ./dist --target node",
+    "format": "bun run eslint . --fix",
+    "lint": "bun run eslint .",
+    "lint:fix": "bun run eslint . --fix",
+    "prepublishOnly": "bun run lint && bun run build"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./index.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "index.ts",
+    "loop.ts",
+    "tools/",
+    "types/",
+    "utils/"
+  ],
+  "keywords": [
+    "computer-use",
+    "playwright",
+    "anthropic",
+    "automation",
+    "ai",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "playwright": "^1.52.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.52.0",
+    "luxon": "3.6.0",
+    "zod": "^3.25.0",
+    "zod-to-json-schema": "^3.23.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0"
+  }
+}
