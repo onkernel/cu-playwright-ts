@@ -190,11 +190,17 @@ export class ComputerTool implements BaseAnthropicTool {
         await this.page.waitForTimeout(100);
       }
 
-      const amount = scrollAmountValue || 100;
+      const pageDimensions = await this.page.evaluate(() => {
+	      return { h: window.innerHeight, w: window.innerWidth };
+      });
+      const pagePartitions = 25;
+      const scrollFactor = (scrollAmountValue || 10) / pagePartitions;
       
       if (scrollDirection === 'down' || scrollDirection === 'up') {
+        const amount = pageDimensions.h * scrollFactor;
         await this.page.mouse.wheel(0, scrollDirection === 'down' ? amount : -amount);
       } else {
+        const amount = pageDimensions.w * scrollFactor;
         await this.page.mouse.wheel(scrollDirection === 'right' ? amount : -amount, 0);
       }
       
