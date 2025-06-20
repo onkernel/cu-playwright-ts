@@ -1,5 +1,6 @@
-import { Action, ToolError } from '../types/computer';
-import type { ActionParams, Coordinate, Duration } from '../types/computer';
+import { ToolError, type ActionParams } from '../types/base';
+import { Action } from '../types/computer';
+import type { Coordinate, Duration } from '../types/computer';
 
 export class ActionValidator {
   static validateText(text: string | undefined, required: boolean, action: string): void {
