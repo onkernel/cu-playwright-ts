@@ -1,12 +1,13 @@
 import type { Page } from 'playwright';
-import { Action, ToolError } from './types/computer';
-import type { ActionParams, BaseAnthropicTool, ToolResult } from './types/computer';
+import { Action } from './types/computer';
+import type { BaseComputerTool, ComputerActionParams } from './types/computer';
 import { KeyboardUtils } from './utils/keyboard';
 import { ActionValidator } from './utils/validator';
+import { ToolError, type ComputerToolDef, type ToolResult } from './types/base';
 
 const TYPING_DELAY_MS = 12;
 
-export class ComputerTool implements BaseAnthropicTool {
+export class ComputerTool implements BaseComputerTool {
   name: 'computer' = 'computer';
   protected page: Page;
   protected _screenshotDelay = 2.0;
@@ -46,7 +47,7 @@ export class ComputerTool implements BaseAnthropicTool {
     return this.version === '20241022' ? 'computer_20241022' : 'computer_20250124';
   }
 
-  toParams(): ActionParams {
+  toParams(): ComputerToolDef{
     const params = {
       name: this.name,
       type: this.apiType,
@@ -136,7 +137,7 @@ export class ComputerTool implements BaseAnthropicTool {
     }
   }
 
-  async call(params: ActionParams): Promise<ToolResult> {
+  async call(params: ComputerActionParams): Promise<ToolResult> {
     const { 
       action, 
       text, 
@@ -174,7 +175,7 @@ export class ComputerTool implements BaseAnthropicTool {
         throw new ToolError(`${action} is only available in version 20250124`);
       }
 
-      const scrollDirection = scrollDirectionParam || kwargs.scroll_direction;
+      const scrollDirection = scrollDirectionParam || kwargs.scroll_direction as string;
       const scrollAmountValue = scrollAmount || scroll_amount;
 
       if (!scrollDirection || !['up', 'down', 'left', 'right'].includes(scrollDirection)) {

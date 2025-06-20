@@ -2,19 +2,18 @@ import { Anthropic } from '@anthropic-ai/sdk';
 import { DateTime } from 'luxon';
 import type { Page } from 'playwright';
 import type { BetaMessageParam, BetaTextBlock } from './types/beta';
-import { ToolCollection, DEFAULT_TOOL_VERSION, TOOL_GROUPS_BY_VERSION, type ToolVersion } from './tools/collection';
+import { ComputerUseToolCollection, DEFAULT_TOOL_VERSION, TOOL_GROUPS_BY_VERSION, type ToolVersion } from './tools/collection';
 import { responseToParams, maybeFilterToNMostRecentImages, injectPromptCaching, PROMPT_CACHING_BETA_FLAG } from './utils/message-processing';
 import { makeApiToolResult } from './utils/tool-results';
 import { ComputerTool20241022, ComputerTool20250124 } from './tools/computer';
-import type { ActionParams } from './tools/types/computer';
 import { Action } from './tools/types/computer';
+import { PlaywrightTool } from './tools/playwright';
 
 // System prompt optimized for the environment
 const SYSTEM_PROMPT = `<SYSTEM_CAPABILITY>
 * You are utilising an Ubuntu virtual machine using ${process.arch} architecture with internet access.
 * When you connect to the display, CHROMIUM IS ALREADY OPEN. The url bar is not visible but it is there.
-* If you need to navigate to a new page, use ctrl+l to focus the url bar and then enter the url.
-* You won't be able  to see the url bar from the screenshot but ctrl-l still works.
+* If you need to navigate to a new page, use the "goto" tool provided.
 * When viewing a page it can be helpful to zoom out so that you can see everything on the page.
 * Either that, or make sure you scroll down to see everything before deciding something isn't available.
 * When using your computer function calls, they take a while to run and send back to you.
@@ -27,7 +26,10 @@ const SYSTEM_PROMPT = `<SYSTEM_CAPABILITY>
 
 <IMPORTANT>
 * When using Chromium, if a startup wizard appears, IGNORE IT. Do not even click "skip this step".
-* Instead, click on the search bar on the center of the screen where it says "Search or enter address", and enter the appropriate search term or URL there.
+* For ALL navigation needs, use the "goto" method - never use keyboard shortcuts or URL bar interactions.
+* The goto method is the reliable way to navigate to any website or URL.
+* If no specific URL is provided to achieve a goal or part of a goal, use Google (https://www.google.com) as your entry point to search for and navigate to relevant websites.
+* For ambiguous requests, use Google to find the most relevant site.
 </IMPORTANT>`;
 
 // Add new type definitions
@@ -41,7 +43,9 @@ interface ExtraBodyConfig {
 }
 
 interface ToolUseInput extends Record<string, unknown> {
-  action: Action;
+  action?: Action;
+  method?: string;
+  args?: string[];
 }
 
 export async function samplingLoop({
@@ -69,7 +73,14 @@ export async function samplingLoop({
 }): Promise<BetaMessageParam[]> {
   const selectedVersion = toolVersion || DEFAULT_TOOL_VERSION;
   const toolGroup = TOOL_GROUPS_BY_VERSION[selectedVersion];
-  const toolCollection = new ToolCollection(...toolGroup.tools.map((Tool: typeof ComputerTool20241022 | typeof ComputerTool20250124) => new Tool(playwrightPage)));
+  
+  // Create computer tools
+  const computerTools = toolGroup.tools.map((Tool: typeof ComputerTool20241022 | typeof ComputerTool20250124) => new Tool(playwrightPage));
+
+  // Create playwright tool
+  const playwrightTool = new PlaywrightTool(playwrightPage);
+  
+  const toolCollection = new ComputerUseToolCollection(...computerTools, playwrightTool);
   
   const system: BetaTextBlock = {
     type: 'text',
@@ -153,41 +164,33 @@ export async function samplingLoop({
     for (const contentBlock of responseParams) {
       if (contentBlock.type === 'tool_use' && contentBlock.name && contentBlock.input && typeof contentBlock.input === 'object') {
         const input = contentBlock.input as ToolUseInput;
-        if ('action' in input && typeof input.action === 'string') {
-          hasToolUse = true;
-          const toolInput: ActionParams = {
-            action: input.action as Action,
-            ...Object.fromEntries(
-              Object.entries(input).filter(([key]) => key !== 'action')
-            )
-          };
-          
-          try {
-            const result = await toolCollection.run(
-              contentBlock.name,
-              toolInput
-            );
+        hasToolUse = true;
 
-            const toolResult = makeApiToolResult(result, contentBlock.id!);
-            toolResultContent.push(toolResult);
-          } catch (error) {
-            console.error(error);
-            throw error;
-          }
+        try {
+          const result = await toolCollection.run(
+            contentBlock.name,
+            input
+          );
+
+          const toolResult = makeApiToolResult(result, contentBlock.id!);
+          toolResultContent.push(toolResult);
+        } catch (error) {
+          console.error(error);
+          throw error;
         }
       }
-    }
 
-    if (toolResultContent.length === 0 && !hasToolUse && response.stop_reason !== 'tool_use') {
-      console.log('No tool use or results, and not waiting for tool use, ending loop');
-      return messages;
-    }
+      if (toolResultContent.length === 0 && !hasToolUse && response.stop_reason !== 'tool_use') {
+        console.log('No tool use or results, and not waiting for tool use, ending loop');
+        return messages;
+      }
 
-    if (toolResultContent.length > 0) {
-      messages.push({
-        role: 'user',
-        content: toolResultContent,
-      });
+      if (toolResultContent.length > 0) {
+        messages.push({
+          role: 'user',
+          content: toolResultContent,
+        });
+      }
     }
   }
 }
