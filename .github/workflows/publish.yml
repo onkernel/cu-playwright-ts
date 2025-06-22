@@ -1,0 +1,54 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for version bumping
+          ssh-key: ${{ secrets.DEPLOY_KEY }}  # Use deploy key to bypass branch protection
+      
+      - name: Setup Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Run linting
+        run: bun run lint
+      
+      - name: Build
+        run: bun run build
+      
+      - name: Bump version and push
+        run: |
+          # Use SSH URL for the repository
+          git remote set-url origin git@github.com:${GITHUB_REPOSITORY}.git
+          # Bump version
+          npm version patch -m "chore: bump version to %s [skip ci]"
+          # Push directly to main
+          git push origin HEAD:main --tags
+      
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} 

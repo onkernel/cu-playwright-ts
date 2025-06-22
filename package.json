@@ -1,7 +1,7 @@
 {
-  "name": "@onkernel/cu-playwright-ts",
+  "name": "@onkernel/cu-playwright",
   "version": "0.1.0",
-  "description": "Computer Use x Playwright SDK - Use Anthropic's Computer Use capabilities with Playwright",
+  "description": "Computer Use x Playwright SDK",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./index.ts",
@@ -35,7 +35,7 @@
     "ai",
     "typescript"
   ],
-  "author": "",
+  "author": "Kernel",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -57,5 +57,8 @@
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
