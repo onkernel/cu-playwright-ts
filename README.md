@@ -13,18 +13,18 @@ A TypeScript SDK that combines Anthropic's Computer Use capabilities with Playwr
 ## Installation
 
 ```bash
-npm install @onkernel/cu-playwright-ts
+npm install @onkernel/cu-playwright
 # or
-yarn add @onkernel/cu-playwright-ts
+yarn add @onkernel/cu-playwright
 # or
-bun add @onkernel/cu-playwright-ts
+bun add @onkernel/cu-playwright
 ```
 
 ## Quick Start
 
 ```typescript
 import { chromium } from 'playwright';
-import { ComputerUseAgent } from '@onkernel/cu-playwright-ts';
+import { ComputerUseAgent } from '@onkernel/cu-playwright';
 
 const browser = await chromium.launch({ headless: false });
 const page = await browser.newPage();
