@@ -18,7 +18,7 @@
     "url": ""
   },
   "scripts": {
-    "build": "bunchee",
+    "build": "bunchee --clean src/index.ts",
     "format": "bun run eslint . --fix",
     "lint": "bun run eslint .",
     "lint:fix": "bun run eslint . --fix",
@@ -26,7 +26,7 @@
   },
   "peerDependencies": {
     "typescript": "^5",
-    "playwright": "^1.52.0"
+    "playwright": "^1.53.0"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.52.0",
