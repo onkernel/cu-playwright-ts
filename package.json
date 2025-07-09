@@ -1,40 +1,15 @@
 {
   "name": "@onkernel/cu-playwright",
   "version": "0.1.2",
-  "description": "Computer Use x Playwright SDK",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./index.ts",
   "type": "module",
+  "description": "Computer Use x Playwright SDK",
   "scripts": {
-    "build": "bun build ./index.ts --outdir ./dist --target node",
+    "build": "bunchee",
     "format": "bun run eslint . --fix",
     "lint": "bun run eslint .",
     "lint:fix": "bun run eslint . --fix",
     "prepublishOnly": "bun run lint && bun run build"
   },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./index.ts"
-    }
-  },
-  "files": [
-    "dist/",
-    "index.ts",
-    "loop.ts",
-    "tools/",
-    "types/",
-    "utils/"
-  ],
-  "keywords": [
-    "computer-use",
-    "playwright",
-    "anthropic",
-    "automation",
-    "ai",
-    "typescript"
-  ],
   "author": "Kernel",
   "license": "MIT",
   "repository": {
@@ -55,10 +30,37 @@
     "@eslint/js": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "bunchee": "^6.5.4",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0"
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "entry": "./index.ts",
+      "import": "./dist/index.js",
+      "types": "./index.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "index.ts",
+    "loop.ts",
+    "tools/",
+    "types/",
+    "utils/"
+  ],
+  "keywords": [
+    "computer-use",
+    "playwright",
+    "anthropic",
+    "automation",
+    "ai",
+    "typescript"
+  ]
 }
