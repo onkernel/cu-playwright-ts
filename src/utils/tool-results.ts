@@ -1,5 +1,9 @@
-import type { ToolResult } from '../tools/types/computer';
-import type { BetaToolResultBlock, BetaTextBlock, BetaImageBlock } from '../types/beta';
+import type { ToolResult } from "../tools/types/computer";
+import type {
+  BetaToolResultBlock,
+  BetaTextBlock,
+  BetaImageBlock,
+} from "../types/beta";
 
 export function makeApiToolResult(
   result: ToolResult,
@@ -11,22 +15,22 @@ export function makeApiToolResult(
   if (result.error) {
     isError = true;
     toolResultContent.push({
-      type: 'text',
+      type: "text",
       text: maybePrependSystemToolResult(result, result.error),
     });
   } else {
     if (result.output) {
       toolResultContent.push({
-        type: 'text',
+        type: "text",
         text: maybePrependSystemToolResult(result, result.output),
       });
     }
     if (result.base64Image) {
       toolResultContent.push({
-        type: 'image',
+        type: "image",
         source: {
-          type: 'base64',
-          media_type: 'image/png',
+          type: "base64",
+          media_type: "image/png",
           data: result.base64Image,
         },
       });
@@ -34,16 +38,19 @@ export function makeApiToolResult(
   }
 
   return {
-    type: 'tool_result',
+    type: "tool_result",
     content: toolResultContent,
     tool_use_id: toolUseId,
     is_error: isError,
   };
 }
 
-export function maybePrependSystemToolResult(result: ToolResult, resultText: string): string {
+export function maybePrependSystemToolResult(
+  result: ToolResult,
+  resultText: string
+): string {
   if (result.system) {
     return `<system>${result.system}</system>\n${resultText}`;
   }
   return resultText;
-} 
+}
