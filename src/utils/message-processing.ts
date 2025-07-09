@@ -1,11 +1,17 @@
-import type { BetaMessage, BetaMessageParam, BetaToolResultBlock, BetaContentBlock, BetaLocalContentBlock } from '../types/beta';
+import type {
+  BetaMessage,
+  BetaMessageParam,
+  BetaToolResultBlock,
+  BetaContentBlock,
+  BetaLocalContentBlock,
+} from "../types/beta";
 
 export function responseToParams(response: BetaMessage): BetaContentBlock[] {
-  return response.content.map(block => {
-    if (block.type === 'text' && block.text) {
-      return { type: 'text', text: block.text };
+  return response.content.map((block) => {
+    if (block.type === "text" && block.text) {
+      return { type: "text", text: block.text };
     }
-    if (block.type === 'thinking') {
+    if (block.type === "thinking") {
       const { thinking, signature, ...rest } = block;
       return { ...rest, thinking, ...(signature && { signature }) };
     }
@@ -21,24 +27,32 @@ export function maybeFilterToNMostRecentImages(
   if (!imagesToKeep) return;
 
   const toolResultBlocks = messages
-    .flatMap(message => Array.isArray(message?.content) ? message.content : [])
-    .filter((item): item is BetaToolResultBlock => 
-      typeof item === 'object' && item.type === 'tool_result'
+    .flatMap((message) =>
+      Array.isArray(message?.content) ? message.content : []
+    )
+    .filter(
+      (item): item is BetaToolResultBlock =>
+        typeof item === "object" && item.type === "tool_result"
     );
 
   const totalImages = toolResultBlocks.reduce((count, toolResult) => {
     if (!Array.isArray(toolResult.content)) return count;
-    return count + toolResult.content.filter(
-      content => typeof content === 'object' && content.type === 'image'
-    ).length;
+    return (
+      count +
+      toolResult.content.filter(
+        (content) => typeof content === "object" && content.type === "image"
+      ).length
+    );
   }, 0);
 
-  let imagesToRemove = Math.floor((totalImages - imagesToKeep) / minRemovalThreshold) * minRemovalThreshold;
+  let imagesToRemove =
+    Math.floor((totalImages - imagesToKeep) / minRemovalThreshold) *
+    minRemovalThreshold;
 
   for (const toolResult of toolResultBlocks) {
     if (Array.isArray(toolResult.content)) {
-      toolResult.content = toolResult.content.filter(content => {
-        if (typeof content === 'object' && content.type === 'image') {
+      toolResult.content = toolResult.content.filter((content) => {
+        if (typeof content === "object" && content.type === "image") {
           if (imagesToRemove > 0) {
             imagesToRemove--;
             return false;
@@ -50,20 +64,22 @@ export function maybeFilterToNMostRecentImages(
   }
 }
 
-const PROMPT_CACHING_BETA_FLAG = 'prompt-caching-2024-07-31';
+const PROMPT_CACHING_BETA_FLAG = "prompt-caching-2024-07-31";
 
 export function injectPromptCaching(messages: BetaMessageParam[]): void {
   let breakpointsRemaining = 3;
-  
+
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i];
     if (!message) continue;
-    if (message.role === 'user' && Array.isArray(message.content)) {
+    if (message.role === "user" && Array.isArray(message.content)) {
       if (breakpointsRemaining > 0) {
         breakpointsRemaining--;
         const lastContent = message.content[message.content.length - 1];
         if (lastContent) {
-          (lastContent as BetaLocalContentBlock).cache_control = { type: 'ephemeral' };
+          (lastContent as BetaLocalContentBlock).cache_control = {
+            type: "ephemeral",
+          };
         }
       } else {
         const lastContent = message.content[message.content.length - 1];
@@ -76,4 +92,4 @@ export function injectPromptCaching(messages: BetaMessageParam[]): void {
   }
 }
 
-export { PROMPT_CACHING_BETA_FLAG }; 
+export { PROMPT_CACHING_BETA_FLAG };

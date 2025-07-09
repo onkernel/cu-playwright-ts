@@ -3,18 +3,26 @@
   "version": "0.1.2",
   "type": "module",
   "description": "Computer Use x Playwright SDK",
+  "author": "Kernel",
+  "license": "MIT",
+  "keywords": [
+    "computer-use",
+    "playwright",
+    "anthropic",
+    "automation",
+    "ai",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "scripts": {
     "build": "bunchee",
     "format": "bun run eslint . --fix",
     "lint": "bun run eslint .",
     "lint:fix": "bun run eslint . --fix",
     "prepublishOnly": "bun run lint && bun run build"
-  },
-  "author": "Kernel",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": ""
   },
   "peerDependencies": {
     "typescript": "^5",
@@ -38,29 +46,10 @@
     "access": "public"
   },
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./index.ts",
   "exports": {
     ".": {
-      "entry": "./index.ts",
       "import": "./dist/index.js",
-      "types": "./index.ts"
+      "types": "./dist/index.d.ts"
     }
-  },
-  "files": [
-    "dist/",
-    "index.ts",
-    "loop.ts",
-    "tools/",
-    "types/",
-    "utils/"
-  ],
-  "keywords": [
-    "computer-use",
-    "playwright",
-    "anthropic",
-    "automation",
-    "ai",
-    "typescript"
-  ]
+  }
 }
